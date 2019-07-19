@@ -10,3 +10,5 @@ CONFIGURATION - AFTER YOUV'VE CLONED, YOU MUST SET THE "jsonFilePath" APPSETTING
 To run for basic evaluation, just open the .sln file in Visual Studio 2017 and hit the debug button. It should launch your default browser to localhost and load the app. It's just one page with a table.
 
 I hope you like it.
+
+
