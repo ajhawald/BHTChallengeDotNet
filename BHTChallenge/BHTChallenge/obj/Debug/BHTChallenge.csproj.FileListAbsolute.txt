@@ -147,3 +147,4 @@ C:\Users\Andy\Documents\Workspace\BHTChallangeDotNet\BHTChallengeDotNet\BHTChall
 C:\Users\Andy\Documents\Workspace\BHTChallangeDotNet\BHTChallengeDotNet\BHTChallenge\BHTChallenge\obj\Debug\BHTChallenge.csproj.CopyComplete
 C:\Users\Andy\Documents\Workspace\BHTChallangeDotNet\BHTChallengeDotNet\BHTChallenge\BHTChallenge\obj\Debug\BHTChallenge.dll
 C:\Users\Andy\Documents\Workspace\BHTChallangeDotNet\BHTChallengeDotNet\BHTChallenge\BHTChallenge\obj\Debug\BHTChallenge.pdb
+C:\Users\Andy\Documents\Workspace\BHTChallangeDotNet\BHTChallengeDotNet\BHTChallenge\BHTChallenge\obj\Debug\BHTChallenge.csprojAssemblyReference.cache

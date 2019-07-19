@@ -26,7 +26,7 @@ namespace BHTChallenge
             List<User> studentUsers = new List<User>();
             List<Score> studentScores = new List<Score>();
 
-            //Read in json file.
+            //THIS PATH MUST BE UPDATED IN WEB.CONFIG TO RUN ON DIFFERENT MACHINES!
             string pathToJson = ConfigurationSettings.AppSettings["jsonFilePath"];
             using (StreamReader r = new StreamReader(pathToJson))
             {
