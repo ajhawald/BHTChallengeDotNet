@@ -6,8 +6,6 @@ using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Web;
-using System.Web.Script.Serialization;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -17,57 +15,70 @@ namespace BHTChallenge
     {
         //This is the final data list.
         public static List<DisplayUser> displayUsers = new List<DisplayUser>();
+        private static List<User> studentUsers = new List<User>();
+        private static List<Score> studentScores = new List<Score>();
 
         protected void Page_Load(object sender, EventArgs e)
         {
             displayUsers.Clear();
 
-            //Lists for aggregating data
-            List<User> studentUsers = new List<User>();
-            List<Score> studentScores = new List<Score>();
-
+            //Read in json file.
             //THIS PATH MUST BE UPDATED IN WEB.CONFIG TO RUN ON DIFFERENT MACHINES!
             string pathToJson = ConfigurationSettings.AppSettings["jsonFilePath"];
             using (StreamReader r = new StreamReader(pathToJson))
             {
                 string json = r.ReadToEnd();
-                JObject studentObj = JObject.Parse(json);
+                JObject jObj = JObject.Parse(json);
 
-                //TODO: use linqToJson instead of loops.
-                foreach (var topLevelNode in studentObj.Children())
-                {
-                    var collection = topLevelNode.Children();
-                    foreach (var dataNode in collection)
-                    {
-                        foreach (var dataItem in dataNode.Children())
-                        {
-                            JObject studentObj3 = JObject.Parse(dataItem.ToString());
-                            string userJason = dataItem.ToString();
-                            var name = studentObj3["name"];
-                            
-                            if (name != null)
-                            {
-                                bool isActive = (bool)studentObj3["active"];
-                                if (isActive)
-                                {
-                                    User usr = new JavaScriptSerializer().Deserialize<User>(userJason);
-                                    studentUsers.Add(usr);
-                                } 
-                            }
-                            else //this is a score
-                            {
-                                Score s = new JavaScriptSerializer().Deserialize<Score>(userJason);
-                                studentScores.Add(s);
-                            }
-                        }
-                    }
-                }
-
+                JArray usersObj = (JArray)jObj["users"];
+                DeserializeUsers(usersObj);
+                JArray scoresObj = (JArray)jObj["scores"];
+                DeserializeScores(scoresObj);
             }
+
             AssembleDisplayUsers(studentUsers, studentScores);
             GridView1.DataSource = ConvertToDatatable(displayUsers);
             GridView1.Attributes.Add("bordercolor", "808080");
-            GridView1.DataBind();          
+            GridView1.DataBind();
+        }
+
+        private static void DeserializeScores(JArray scoresObj)
+        {
+            studentScores.Clear();
+            foreach (var score in scoresObj)
+            {
+                JObject scoreObj = new JObject();
+                try
+                {
+                    scoreObj = JObject.Parse(score.ToString());
+                }
+                catch (Exception)
+                {
+                    //TODO set up exception handling methods
+                    //throw;
+                }
+                Score scr = JsonConvert.DeserializeObject<Score>(scoreObj.ToString());
+                studentScores.Add(scr);
+            }
+        }
+
+        private static void DeserializeUsers(JArray usersObj)
+        {
+            foreach (var user in usersObj)
+            {
+                JObject userObj = new JObject();
+                try
+                {
+                    userObj = JObject.Parse(user.ToString());
+                }
+                catch (Exception)
+                {
+                    //TODO set up exception handling methods
+                    //throw;
+                }
+                User usr = JsonConvert.DeserializeObject<User>(userObj.ToString());
+                studentUsers.Add(usr);
+            }
         }
 
         protected void GridView1_RowDataBound(object sender, System.Web.UI.WebControls.GridViewRowEventArgs e)
@@ -77,9 +88,6 @@ namespace BHTChallenge
             {
                 e.Row.TableSection = TableRowSection.TableHeader;
             }
-            //hide html on list of scores.
-            string htmlColumn = HttpUtility.HtmlDecode(e.Row.Cells[3].Text);
-            e.Row.Cells[3].Text = htmlColumn;
         }
 
         //this takes all the data converts it to the final list of display objects.
@@ -91,23 +99,11 @@ namespace BHTChallenge
                 du.id = User.id;
                 du.name = User.name;
                 du.created = User.created_at;
-                var intScores = scores.Where(s => s.user_id == User.id).Select(s => s.score).ToList();
-                du.scoreList = intScores;
-                du.scoreListString = convertScoresToHtmlList(intScores);
-                du.scoreAverage = System.Math.Round(du.scoreList.Average(), 2); 
+                du.scoreList = scores.Where(s => s.user_id == User.id).Select(s => s.score).ToList();
+                du.scoreListString = string.Join(",", du.scoreList.Select(n => n.ToString()).ToArray());
+                du.scoreAverage = System.Math.Round(du.scoreList.Average(), 2);
                 displayUsers.Add(du);
             }
-        }
-
-        //to have the scores in one cell listed vertically.
-        private static string convertScoresToHtmlList(List<int> scores)
-        {
-            string scoreList = string.Empty;
-            foreach (var item in scores)
-            {
-                scoreList += item.ToString() + "</br>";
-            }
-            return scoreList;
         }
 
         //create dt for gridview.
@@ -132,9 +128,9 @@ namespace BHTChallenge
             return dt;
         }
 
-       
-//OBJECTS
 
+        //OBJECTS
+        [Serializable]
         public class Score
         {
             [JsonProperty("user_id")]
@@ -145,6 +141,7 @@ namespace BHTChallenge
 
         }
 
+        [Serializable]
         public class User
         {
             [JsonProperty("id")]
