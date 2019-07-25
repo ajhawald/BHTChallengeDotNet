@@ -64,6 +64,7 @@ namespace BHTChallenge
 
         private static void DeserializeUsers(JArray usersObj)
         {
+            studentUsers.Clear();
             foreach (var user in usersObj)
             {
                 JObject userObj = new JObject();
