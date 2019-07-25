@@ -15,10 +15,10 @@ namespace BHTChallenge
     {
         //This is the final data list.
         public static List<DisplayUser> displayUsers = new List<DisplayUser>();
-        private static List<User> studentUsers = new List<User>();
-        private static List<Score> studentScores = new List<Score>();
+        public static List<User> studentUsers = new List<User>();
+        public static List<Score> studentScores = new List<Score>();
 
-        protected void Page_Load(object sender, EventArgs e)
+        public void Page_Load(object sender, EventArgs e)
         {
             displayUsers.Clear();
 
@@ -42,7 +42,7 @@ namespace BHTChallenge
             GridView1.DataBind();
         }
 
-        private static void DeserializeScores(JArray scoresObj)
+        public static void DeserializeScores(JArray scoresObj)
         {
             studentScores.Clear();
             foreach (var score in scoresObj)
@@ -62,7 +62,7 @@ namespace BHTChallenge
             }
         }
 
-        private static void DeserializeUsers(JArray usersObj)
+        public static void DeserializeUsers(JArray usersObj)
         {
             studentUsers.Clear();
             foreach (var user in usersObj)
