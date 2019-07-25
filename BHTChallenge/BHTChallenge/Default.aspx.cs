@@ -27,13 +27,20 @@ namespace BHTChallenge
             string pathToJson = ConfigurationSettings.AppSettings["jsonFilePath"];
             using (StreamReader r = new StreamReader(pathToJson))
             {
-                string json = r.ReadToEnd();
-                JObject jObj = JObject.Parse(json);
+                try
+                {
+                    string json = r.ReadToEnd();
+                    JObject jObj = JObject.Parse(json);
 
-                JArray usersObj = (JArray)jObj["users"];
-                DeserializeUsers(usersObj);
-                JArray scoresObj = (JArray)jObj["scores"];
-                DeserializeScores(scoresObj);
+                    JArray usersObj = (JArray)jObj["users"];
+                    DeserializeUsers(usersObj);
+                    JArray scoresObj = (JArray)jObj["scores"];
+                    DeserializeScores(scoresObj);
+                }
+                catch (Exception)
+                {
+                    throw new FileNotFoundException("could not find json file");
+                }               
             }
 
             AssembleDisplayUsers(studentUsers, studentScores);
